@@ -316,8 +316,13 @@
 
         <!-- Verified badge -->
         <div id="verified-badge" class="verified-banner">
-          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
-          <span>Bank account verified successfully via RazorpayX FAV</span>
+          <div class="verified-icon-wrap">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+          </div>
+          <div>
+            <div class="verified-title">Bank account verified successfully!</div>
+            <div class="verified-sub">Details fetched live from NPCI &nbsp;·&nbsp; Powered by RazorpayX</div>
+          </div>
         </div>
 
         <!-- Bank Details Card -->
@@ -366,6 +371,12 @@
               </div>
             </div>
           </details>
+        </div>
+
+        <!-- NPCI source note -->
+        <div class="npci-note">
+          <svg viewBox="0 0 20 20" fill="currentColor" class="npci-shield"><path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z" clip-rule="evenodd"/></svg>
+          <p><strong>Verified by NPCI</strong> — All details above (account holder name, account number, IFSC &amp; UPI ID) are sourced directly from the <strong>National Payments Corporation of India (NPCI)</strong> via RazorpayX Fund Account Validation. These details are authentic and tamper-proof.</p>
         </div>
 
         <!-- Demo mode note -->

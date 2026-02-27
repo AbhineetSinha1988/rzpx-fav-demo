@@ -483,17 +483,35 @@ input::placeholder { color: var(--text-muted); }
 .verified-banner {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
+  gap: 14px;
+  padding: 14px 18px;
   background: var(--success-bg);
-  border: 1px solid var(--success-border);
+  border: 1.5px solid var(--success-border);
   border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--success);
   margin-bottom: 24px;
 }
-.verified-banner svg { width: 20px; height: 20px; flex-shrink: 0; }
+.verified-icon-wrap {
+  width: 36px; height: 36px;
+  background: var(--success);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.verified-icon-wrap svg { width: 20px; height: 20px; color: #fff; }
+.verified-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--success);
+}
+.verified-sub {
+  font-size: 12px;
+  color: #065F46;
+  margin-top: 2px;
+  opacity: 0.85;
+}
 
 /* ─── BANK DETAILS CARD ──────────────────────────────────────── */
 .bank-card {
@@ -948,3 +966,48 @@ details[open] .ref-summary::after { content: ' ‹'; }
 }
 .rpd-waiting-inner .loading-text { font-size: 14px; margin-bottom: 2px; }
 .rpd-waiting-inner .loading-sub  { font-size: 12px; }
+
+/* ─── NPCI NOTE ──────────────────────────────────────────────── */
+.npci-note {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  background: #F0FDF4;
+  border: 1.5px solid #86EFAC;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+.npci-shield {
+  width: 20px; height: 20px;
+  color: #16A34A;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.npci-note p {
+  font-size: 13px;
+  color: #14532D;
+  line-height: 1.55;
+}
+.npci-note strong { color: #15803D; }
+
+/* ─── CONFETTI ───────────────────────────────────────────────── */
+.confetti-wrap {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+.confetti-p {
+  position: absolute;
+  top: -14px;
+  opacity: 0;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  75%  { opacity: 1; }
+  100% { transform: translateY(108vh) rotate(800deg); opacity: 0; }
+}

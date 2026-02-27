@@ -407,11 +407,38 @@ const App = (() => {
     goTo(0);
   }
 
+  // ─── Celebration confetti ─────────────────────────────────────
+  function triggerConfetti() {
+    const COLORS = ['#1D4ED8', '#059669', '#7C3AED', '#F59E0B', '#EF4444', '#06B6D4', '#10B981'];
+    const wrap = document.createElement('div');
+    wrap.className = 'confetti-wrap';
+    document.body.appendChild(wrap);
+
+    for (let i = 0; i < 72; i++) {
+      const p = document.createElement('div');
+      p.className = 'confetti-p';
+      const size = Math.random() * 9 + 5;
+      p.style.cssText = `
+        left: ${Math.random() * 100}%;
+        width: ${size}px;
+        height: ${size}px;
+        background: ${COLORS[Math.floor(Math.random() * COLORS.length)]};
+        border-radius: ${Math.random() > 0.4 ? '50%' : '3px'};
+        animation-delay: ${(Math.random() * 0.6).toFixed(2)}s;
+        animation-duration: ${(Math.random() * 2 + 1.8).toFixed(2)}s;
+      `;
+      wrap.appendChild(p);
+    }
+
+    setTimeout(() => wrap.remove(), 4200);
+  }
+
   // ─── Override goTo to handle success population ───────────────
   const _goTo = goTo;
   function goToPublic(step) {
     if (step === 4) populateSuccess();
     _goTo(step);
+    if (step === 3) triggerConfetti();
   }
 
   // ─── Bootstrap ────────────────────────────────────────────────
