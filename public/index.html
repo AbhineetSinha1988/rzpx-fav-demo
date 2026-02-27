@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LendBridge — Business Loan Application</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     APP SHELL
+════════════════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <svg class="brand-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="8" fill="#1D4ED8"/>
+          <path d="M6 22L13 10L16 16L19 12L26 22H6Z" fill="white" opacity="0.9"/>
+          <rect x="8" y="20" width="16" height="2" rx="1" fill="white"/>
+        </svg>
+        <span class="brand-name">LendBridge</span>
+      </div>
+      <div id="demo-pill" class="demo-pill hidden">
+        <span class="demo-dot"></span>Demo Mode
+      </div>
+    </div>
+  </header>
+
+  <!-- Progress Bar (visible steps 1–3) -->
+  <div id="progress-wrap" class="progress-wrap hidden">
+    <div class="progress-inner">
+      <div class="progress-step" id="ps-1">
+        <div class="ps-circle" data-step="1"><span>1</span></div>
+        <div class="ps-label">Your Details</div>
+      </div>
+      <div class="ps-line" id="pl-1"></div>
+      <div class="progress-step" id="ps-2">
+        <div class="ps-circle" data-step="2"><span>2</span></div>
+        <div class="ps-label">Verify Bank</div>
+      </div>
+      <div class="ps-line" id="pl-2"></div>
+      <div class="progress-step" id="ps-3">
+        <div class="ps-circle" data-step="3"><span>3</span></div>
+        <div class="ps-label">Confirm</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── STEP SCREENS ─────────────────────────────────────── -->
+  <main class="app-main">
+
+    <!-- ══ SCREEN 0 — Welcome ═════════════════════════════════ -->
+    <div id="screen-welcome" class="screen active">
+      <div class="card welcome-card">
+        <div class="welcome-badge">Powered by RazorpayX FAV</div>
+        <h1 class="welcome-heading">Business Loan<br/>Made Simple</h1>
+        <p class="welcome-sub">Get up to ₹50 Lakhs in 24 hours. Minimal documentation, instant bank verification, no branch visits.</p>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="feature-icon green">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+            </div>
+            <span>Instant bank account verification via UPI</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon blue">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1a6 6 0 00-3.815 10.631C7.237 12.5 8 13.443 8 14.456v.644a.75.75 0 00.572.729 6.016 6.016 0 002.856 0A.75.75 0 0012 15.1v-.644c0-1.013.762-1.957 1.815-2.825A6 6 0 0010 1zM8.863 17.414a.75.75 0 00-.226 1.483 9.066 9.066 0 002.726 0 .75.75 0 00-.226-1.483 7.553 7.553 0 01-2.274 0z"/></svg>
+            </div>
+            <span>Zero physical documentation required</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon purple">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z" clip-rule="evenodd"/></svg>
+            </div>
+            <span>Funds disbursed within 24 hours of approval</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg" onclick="App.goTo(1)">
+          Apply Now
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/></svg>
+        </button>
+
+        <p class="welcome-note">Takes less than 3 minutes &nbsp;·&nbsp; No credit score impact</p>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 1 — Your Details ════════════════════════════ -->
+    <div id="screen-details" class="screen">
+      <div class="card">
+        <div class="card-header">
+          <div class="step-number">1</div>
+          <div>
+            <h2 class="card-title">Tell us about yourself</h2>
+            <p class="card-sub">Basic information to get started</p>
+          </div>
+        </div>
+
+        <form id="form-details" novalidate>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="inp-name">Full Name <span class="req">*</span></label>
+              <input id="inp-name" type="text" placeholder="Rahul Kumar" autocomplete="name" />
+              <div class="field-error" id="err-name"></div>
+            </div>
+            <div class="form-group">
+              <label for="inp-email">Email Address <span class="req">*</span></label>
+              <input id="inp-email" type="email" placeholder="rahul@company.com" autocomplete="email" />
+              <div class="field-error" id="err-email"></div>
+            </div>
+            <div class="form-group">
+              <label for="inp-phone">Mobile Number <span class="req">*</span></label>
+              <div class="input-with-prefix">
+                <span class="input-prefix">+91</span>
+                <input id="inp-phone" type="tel" placeholder="9876543210" maxlength="10" autocomplete="tel" />
+              </div>
+              <div class="field-error" id="err-phone"></div>
+            </div>
+            <div class="form-group">
+              <label for="inp-loan">Loan Amount Required <span class="req">*</span></label>
+              <div class="input-with-prefix">
+                <span class="input-prefix">₹</span>
+                <input id="inp-loan" type="number" placeholder="500000" min="50000" max="5000000" />
+              </div>
+              <div class="field-hint">₹50,000 – ₹50,00,000</div>
+              <div class="field-error" id="err-loan"></div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" onclick="App.goTo(0)">Back</button>
+            <button type="submit" class="btn btn-primary">
+              Continue
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/></svg>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 2 — Bank Verification ══════════════════════ -->
+    <div id="screen-verify" class="screen">
+      <div class="card">
+        <div class="card-header">
+          <div class="step-number">2</div>
+          <div>
+            <h2 class="card-title">Verify your bank account</h2>
+            <p class="card-sub">We'll instantly fetch and verify your bank details</p>
+          </div>
+        </div>
+
+        <!-- How it works hint -->
+        <div class="info-box">
+          <svg viewBox="0 0 20 20" fill="currentColor" class="info-icon"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clip-rule="evenodd"/></svg>
+          <p>Enter your UPI ID or registered mobile number. We use RazorpayX Fund Account Validation to verify your bank account instantly — no manual entry needed.</p>
+        </div>
+
+        <!-- Toggle Tabs -->
+        <div class="verify-tabs">
+          <button class="verify-tab active" data-tab="upi" onclick="App.switchTab('upi')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+            UPI ID
+          </button>
+          <button class="verify-tab" data-tab="phone" onclick="App.switchTab('phone')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.64 2 2 0 012-2.18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 6a16 16 0 006.91 6.91l.76-.76a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            Phone Number
+          </button>
+        </div>
+
+        <form id="form-verify" novalidate>
+          <!-- UPI Tab -->
+          <div id="tab-upi" class="tab-panel active">
+            <div class="form-group">
+              <label for="inp-upi">UPI ID (VPA)</label>
+              <input id="inp-upi" type="text" placeholder="yourname@okhdfcbank" autocomplete="off" spellcheck="false" />
+              <div class="field-hint">e.g. rahul@okhdfcbank, 9876543210@paytm, name@ybl</div>
+              <div class="field-error" id="err-upi"></div>
+            </div>
+          </div>
+
+          <!-- Phone Tab -->
+          <div id="tab-phone" class="tab-panel">
+            <div class="form-group">
+              <label for="inp-vpa-phone">Mobile Number (UPI Registered)</label>
+              <div class="input-with-prefix">
+                <span class="input-prefix">+91</span>
+                <input id="inp-vpa-phone" type="tel" placeholder="9876543210" maxlength="10" />
+              </div>
+              <div class="field-hint">Must be the mobile number linked to your UPI / bank account</div>
+              <div class="field-error" id="err-vpa-phone"></div>
+            </div>
+          </div>
+
+          <!-- Loading state overlay -->
+          <div id="verify-loading" class="verify-loading hidden">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Validating via RazorpayX FAV…</p>
+            <p class="loading-sub">Fetching bank details securely</p>
+          </div>
+
+          <!-- Error state -->
+          <div id="verify-error" class="alert-error hidden">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd"/></svg>
+            <span id="verify-error-msg"></span>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" onclick="App.goTo(1)">Back</button>
+            <button type="submit" class="btn btn-primary" id="btn-verify">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 000-5.304 3 3 0 00-3.75-3.751 3 3 0 00-5.305 0 3 3 0 00-3.751 3.75 3 3 0 000 5.305 3 3 0 003.75 3.751 3 3 0 005.305 0 3 3 0 003.751-3.75zm-2.546-4.46a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+              Verify Bank Account
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 3 — Confirm Bank Details ═══════════════════ -->
+    <div id="screen-confirm" class="screen">
+      <div class="card">
+        <div class="card-header">
+          <div class="step-number">3</div>
+          <div>
+            <h2 class="card-title">Confirm bank details</h2>
+            <p class="card-sub">Please review the fetched details before proceeding</p>
+          </div>
+        </div>
+
+        <!-- Verified badge -->
+        <div id="verified-badge" class="verified-banner">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+          <span>Bank account verified successfully via RazorpayX FAV</span>
+        </div>
+
+        <!-- Bank Details Card -->
+        <div id="bank-details-card" class="bank-card">
+          <div class="bank-card-header">
+            <div id="bank-avatar" class="bank-avatar">HB</div>
+            <div>
+              <div id="bank-name-display" class="bank-name-text">HDFC Bank</div>
+              <div id="bank-branch-display" class="bank-branch-text">Main Branch</div>
+            </div>
+            <div class="bank-status-badge">
+              <span class="status-dot"></span>Active
+            </div>
+          </div>
+
+          <div class="bank-details-grid">
+            <div class="detail-item">
+              <div class="detail-label">Account Holder</div>
+              <div id="detail-name" class="detail-value">—</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">UPI ID / VPA</div>
+              <div id="detail-vpa" class="detail-value mono">—</div>
+            </div>
+            <div class="detail-item" id="row-account">
+              <div class="detail-label">Account Number</div>
+              <div id="detail-account" class="detail-value mono">—</div>
+            </div>
+            <div class="detail-item" id="row-ifsc">
+              <div class="detail-label">IFSC Code</div>
+              <div id="detail-ifsc" class="detail-value mono">—</div>
+            </div>
+          </div>
+
+          <!-- Reference IDs (collapsible) -->
+          <details class="ref-details">
+            <summary class="ref-summary">RazorpayX Reference IDs</summary>
+            <div class="ref-grid">
+              <div class="detail-item">
+                <div class="detail-label">Fund Account ID</div>
+                <div id="detail-fa-id" class="detail-value mono small">—</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">Validation ID</div>
+                <div id="detail-fav-id" class="detail-value mono small">—</div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Demo mode note -->
+        <div id="demo-note" class="demo-note hidden">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+          <span><strong>Demo Mode:</strong> Bank details shown above are illustrative mock data. Configure <code>.env</code> with RazorpayX credentials to use live FAV APIs.</span>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" onclick="App.goTo(2)">Re-verify</button>
+          <button type="button" class="btn btn-primary" onclick="App.goTo(4)">
+            Confirm & Submit Application
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 4 — Success ═════════════════════════════════ -->
+    <div id="screen-success" class="screen">
+      <div class="card success-card">
+        <div class="success-icon-wrap">
+          <div class="success-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+        </div>
+        <h2 class="success-heading">Application Submitted!</h2>
+        <p class="success-sub">Your loan application has been received. Our team will review your details and get back to you within <strong>2 business hours</strong>.</p>
+
+        <div class="success-ref-box">
+          <div class="success-ref-row">
+            <span class="success-ref-label">Application ID</span>
+            <span id="success-app-id" class="success-ref-value mono">LB-2025-XXXXXX</span>
+          </div>
+          <div class="success-ref-row">
+            <span class="success-ref-label">Applicant</span>
+            <span id="success-name" class="success-ref-value">—</span>
+          </div>
+          <div class="success-ref-row">
+            <span class="success-ref-label">Bank Verified</span>
+            <span id="success-bank" class="success-ref-value">—</span>
+          </div>
+          <div class="success-ref-row">
+            <span class="success-ref-label">Loan Amount</span>
+            <span id="success-loan" class="success-ref-value">—</span>
+          </div>
+        </div>
+
+        <div class="success-steps">
+          <div class="success-step done">
+            <div class="ss-dot done"></div>
+            <span>Bank account verified</span>
+          </div>
+          <div class="success-step done">
+            <div class="ss-dot done"></div>
+            <span>Application submitted</span>
+          </div>
+          <div class="success-step pending">
+            <div class="ss-dot pending"></div>
+            <span>Credit assessment (2–4 hrs)</span>
+          </div>
+          <div class="success-step pending">
+            <div class="ss-dot pending"></div>
+            <span>Offer generation</span>
+          </div>
+          <div class="success-step pending">
+            <div class="ss-dot pending"></div>
+            <span>Disbursal within 24 hrs</span>
+          </div>
+        </div>
+
+        <button class="btn btn-ghost" onclick="App.reset()">Start New Application</button>
+      </div>
+    </div>
+
+  </main>
+  <!-- end app-main -->
+
+</div>
+<!-- end #app -->
+
+<script src="app.js"></script>
+</body>
+</html>
