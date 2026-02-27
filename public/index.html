@@ -153,73 +153,153 @@
           <div class="step-number">2</div>
           <div>
             <h2 class="card-title">Verify your bank account</h2>
-            <p class="card-sub">We'll instantly fetch and verify your bank details</p>
+            <p class="card-sub">Choose how you'd like to verify</p>
           </div>
         </div>
 
         <!-- How it works hint -->
         <div class="info-box">
           <svg viewBox="0 0 20 20" fill="currentColor" class="info-icon"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clip-rule="evenodd"/></svg>
-          <p>Enter your UPI ID or registered mobile number. We use RazorpayX Fund Account Validation to verify your bank account instantly — no manual entry needed.</p>
+          <p>We use RazorpayX Fund Account Validation to verify your bank instantly — no branch visit, no paperwork.</p>
         </div>
 
-        <!-- Toggle Tabs -->
-        <div class="verify-tabs">
-          <button class="verify-tab active" data-tab="upi" onclick="App.switchTab('upi')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
-            UPI ID
+        <!-- Verification method selector -->
+        <div class="verify-options">
+          <button class="verify-option active" data-mode="upi" onclick="App.switchMode('upi')">
+            <div class="option-radio"><span class="radio-inner"></span></div>
+            <div>
+              <div class="option-title">Enter UPI ID</div>
+              <div class="option-desc">I know my UPI ID (e.g. name@okhdfcbank)</div>
+            </div>
           </button>
-          <button class="verify-tab" data-tab="phone" onclick="App.switchTab('phone')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.64 2 2 0 012-2.18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 6a16 16 0 006.91 6.91l.76-.76a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-            Phone Number
+          <button class="verify-option" data-mode="rpd" onclick="App.switchMode('rpd')">
+            <div class="option-radio"><span class="radio-inner"></span></div>
+            <div>
+              <div class="option-title">Don't remember your UPI ID? No worries, we have your back</div>
+              <div class="option-desc">Verify via a ₹1 UPI payment — bank details fetched automatically</div>
+            </div>
           </button>
         </div>
 
-        <form id="form-verify" novalidate>
-          <!-- UPI Tab -->
-          <div id="tab-upi" class="tab-panel active">
+        <!-- ── Panel: UPI ID entry ── -->
+        <div id="panel-upi" class="verify-panel active">
+          <form id="form-verify" novalidate>
             <div class="form-group">
               <label for="inp-upi">UPI ID (VPA)</label>
               <input id="inp-upi" type="text" placeholder="yourname@okhdfcbank" autocomplete="off" spellcheck="false" />
               <div class="field-hint">e.g. rahul@okhdfcbank, 9876543210@paytm, name@ybl</div>
               <div class="field-error" id="err-upi"></div>
             </div>
-          </div>
 
-          <!-- Phone Tab -->
-          <div id="tab-phone" class="tab-panel">
-            <div class="form-group">
-              <label for="inp-vpa-phone">Mobile Number (UPI Registered)</label>
-              <div class="input-with-prefix">
-                <span class="input-prefix">+91</span>
-                <input id="inp-vpa-phone" type="tel" placeholder="9876543210" maxlength="10" />
+            <div id="verify-loading" class="verify-loading hidden">
+              <div class="loading-spinner"></div>
+              <p class="loading-text">Validating via RazorpayX FAV…</p>
+              <p class="loading-sub">Fetching bank details securely</p>
+            </div>
+
+            <div id="verify-error" class="alert-error hidden">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd"/></svg>
+              <span id="verify-error-msg"></span>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-ghost" onclick="App.goTo(1)">Back</button>
+              <button type="submit" class="btn btn-primary" id="btn-verify">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 000-5.304 3 3 0 00-3.75-3.751 3 3 0 00-5.305 0 3 3 0 00-3.751 3.75 3 3 0 000 5.305 3 3 0 003.75 3.751 3 3 0 005.305 0 3 3 0 003.751-3.75zm-2.546-4.46a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+                Verify Bank Account
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ── Panel: Reverse Penny Drop ── -->
+        <div id="panel-rpd" class="verify-panel">
+
+          <!-- Intro state -->
+          <div id="rpd-intro">
+            <div class="rpd-intro-box">
+              <div class="rpd-intro-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 8v4l3 1.5"/>
+                </svg>
               </div>
-              <div class="field-hint">Must be the mobile number linked to your UPI / bank account</div>
-              <div class="field-error" id="err-vpa-phone"></div>
+              <h3 class="rpd-intro-title">Verify via ₹1 UPI Payment</h3>
+              <p class="rpd-intro-desc">Pay ₹1 from any UPI app linked to your bank. We'll instantly capture your bank details — no manual entry needed.</p>
+              <ul class="rpd-steps">
+                <li><span class="rpd-step-num">1</span><span>Click "Start" — a ₹1 payment request is created</span></li>
+                <li><span class="rpd-step-num">2</span><span>Pay using PhonePe, GPay, Paytm or any UPI app</span></li>
+                <li><span class="rpd-step-num">3</span><span>Your bank details are verified automatically</span></li>
+              </ul>
+              <p class="rpd-refund-note">₹1 will be refunded within 2–3 business days</p>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-ghost" onclick="App.goTo(1)">Back</button>
+              <button type="button" class="btn btn-primary" id="btn-start-rpd" onclick="App.startRPD()">
+                Start Verification
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/></svg>
+              </button>
             </div>
           </div>
 
-          <!-- Loading state overlay -->
-          <div id="verify-loading" class="verify-loading hidden">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Validating via RazorpayX FAV…</p>
-            <p class="loading-sub">Fetching bank details securely</p>
+          <!-- Payment state (after initiation) -->
+          <div id="rpd-pay" class="hidden">
+
+            <!-- Desktop: QR code -->
+            <div id="rpd-qr-wrap" class="rpd-qr-wrap">
+              <p class="rpd-pay-label">Scan with any UPI app to pay ₹1</p>
+              <img id="rpd-qr-img" src="" alt="UPI QR Code" class="rpd-qr-img" />
+              <p class="rpd-qr-hint">Works with PhonePe, Google Pay, Paytm, BHIM &amp; all UPI apps</p>
+            </div>
+
+            <!-- Mobile: App deep-link buttons -->
+            <div id="rpd-apps-wrap" class="rpd-apps-wrap hidden">
+              <p class="rpd-pay-label">Tap to open your UPI app and pay ₹1</p>
+              <div class="rpd-app-buttons">
+                <a id="rpd-btn-phonepe" class="rpd-app-btn" href="#" target="_self">
+                  <span class="app-icon phonepe-icon">Pe</span>PhonePe
+                </a>
+                <a id="rpd-btn-gpay" class="rpd-app-btn" href="#" target="_self">
+                  <span class="app-icon gpay-icon">G</span>Google Pay
+                </a>
+                <a id="rpd-btn-paytm" class="rpd-app-btn" href="#" target="_self">
+                  <span class="app-icon paytm-icon">P</span>Paytm
+                </a>
+                <a id="rpd-btn-bhim" class="rpd-app-btn" href="#" target="_self">
+                  <span class="app-icon bhim-icon">B</span>BHIM
+                </a>
+                <a id="rpd-btn-any" class="rpd-app-btn rpd-app-btn-wide" href="#" target="_self">
+                  <svg viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;flex-shrink:0"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm1 11H9v-4h2v4zm0-6H9V5h2v2z"/></svg>
+                  Other UPI App
+                </a>
+              </div>
+            </div>
+
+            <!-- Waiting indicator -->
+            <div class="rpd-waiting">
+              <div class="rpd-waiting-inner">
+                <div class="loading-spinner"></div>
+                <div>
+                  <p class="loading-text">Waiting for payment…</p>
+                  <p class="loading-sub">Complete the ₹1 payment above to continue</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Error -->
+            <div id="rpd-error" class="alert-error hidden">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd"/></svg>
+              <span id="rpd-error-msg"></span>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-ghost" onclick="App.cancelRPD()">Cancel</button>
+            </div>
           </div>
 
-          <!-- Error state -->
-          <div id="verify-error" class="alert-error hidden">
-            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd"/></svg>
-            <span id="verify-error-msg"></span>
-          </div>
+        </div>
+        <!-- end panel-rpd -->
 
-          <div class="form-actions">
-            <button type="button" class="btn btn-ghost" onclick="App.goTo(1)">Back</button>
-            <button type="submit" class="btn btn-primary" id="btn-verify">
-              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 000-5.304 3 3 0 00-3.75-3.751 3 3 0 00-5.305 0 3 3 0 00-3.751 3.75 3 3 0 000 5.305 3 3 0 003.75 3.751 3 3 0 005.305 0 3 3 0 003.751-3.75zm-2.546-4.46a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
-              Verify Bank Account
-            </button>
-          </div>
-        </form>
       </div>
     </div>
 

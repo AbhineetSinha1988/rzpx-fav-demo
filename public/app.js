@@ -4,9 +4,11 @@
 
 const App = (() => {
   // ─── State ─────────────────────────────────────────────────
-  let currentStep = 0;
-  let isDemoMode  = true;
-  let activeTab   = 'upi';
+  let currentStep  = 0;
+  let isDemoMode   = true;
+  let verifyMode   = 'upi';   // 'upi' | 'rpd'
+  let rpdFavId     = null;
+  let rpdPollTimer = null;
 
   const applicant = {
     name: '', email: '', phone: '', loanAmount: 0,
@@ -53,13 +55,11 @@ const App = (() => {
       const el = document.getElementById(id);
       el.classList.toggle('active', i === step);
     });
-
     const progressWrap = document.getElementById('progress-wrap');
     progressWrap.classList.toggle('hidden', step === 0 || step === 4);
   }
 
   function updateProgress(step) {
-    // steps: 1 = details, 2 = verify, 3 = confirm
     const circles = [
       document.querySelector('#ps-1 .ps-circle'),
       document.querySelector('#ps-2 .ps-circle'),
@@ -75,43 +75,31 @@ const App = (() => {
       document.getElementById('pl-2'),
     ];
 
-    circles.forEach((c, i) => {
-      c.classList.remove('active', 'done');
-      labels[i].classList.remove('active', 'done');
-    });
+    circles.forEach((c, i) => { c.classList.remove('active', 'done'); labels[i].classList.remove('active', 'done'); });
     lines.forEach(l => l.classList.remove('done'));
 
-    // step 1 = "details", maps to progress index 0
-    const pi = step - 1; // 0-based progress index
+    const pi = step - 1;
     for (let i = 0; i < 3; i++) {
-      if (i < pi) {
-        circles[i].classList.add('done');
-        labels[i].classList.add('done');
-      } else if (i === pi) {
-        circles[i].classList.add('active');
-        labels[i].classList.add('active');
-      }
+      if (i < pi)       { circles[i].classList.add('done');   labels[i].classList.add('done'); }
+      else if (i === pi){ circles[i].classList.add('active'); labels[i].classList.add('active'); }
     }
     for (let i = 0; i < 2; i++) {
       if (i < pi - 1) lines[i].classList.add('done');
     }
   }
 
-  // ─── Tab switching ───────────────────────────────────────────
-  function switchTab(tab) {
-    activeTab = tab;
-
-    document.querySelectorAll('.verify-tab').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.tab === tab);
+  // ─── Verification mode switching ─────────────────────────────
+  function switchMode(mode) {
+    verifyMode = mode;
+    document.querySelectorAll('.verify-option').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mode === mode);
     });
-    document.getElementById('tab-upi').classList.toggle('active',   tab === 'upi');
-    document.getElementById('tab-phone').classList.toggle('active', tab === 'phone');
+    document.getElementById('panel-upi').classList.toggle('active', mode === 'upi');
+    document.getElementById('panel-rpd').classList.toggle('active', mode === 'rpd');
 
-    // Clear errors
-    ['err-upi', 'err-vpa-phone'].forEach(id => {
-      document.getElementById(id).textContent = '';
-    });
+    clearFieldError('inp-upi', 'err-upi');
     hideVerifyError();
+    hideRPDError();
   }
 
   // ─── Form binding ────────────────────────────────────────────
@@ -159,25 +147,15 @@ const App = (() => {
     goTo(2);
   }
 
-  // ─── Step 2 — Bank verification ──────────────────────────────
+  // ─── Step 2 — UPI ID verification ────────────────────────────
   async function onVerifySubmit(e) {
     e.preventDefault();
 
-    let value;
-    if (activeTab === 'upi') {
-      value = document.getElementById('inp-upi').value.trim();
-      clearFieldError('inp-upi', 'err-upi');
-      if (!value || !isValidUPI(value)) {
-        setFieldError('inp-upi', 'err-upi', 'Enter a valid UPI ID (e.g. name@okhdfcbank)');
-        return;
-      }
-    } else {
-      value = document.getElementById('inp-vpa-phone').value.trim();
-      clearFieldError('inp-vpa-phone', 'err-vpa-phone');
-      if (!value || !/^\d{10}$/.test(value)) {
-        setFieldError('inp-vpa-phone', 'err-vpa-phone', 'Enter a valid 10-digit mobile number');
-        return;
-      }
+    const value = document.getElementById('inp-upi').value.trim();
+    clearFieldError('inp-upi', 'err-upi');
+    if (!value || !isValidUPI(value)) {
+      setFieldError('inp-upi', 'err-upi', 'Enter a valid UPI ID (e.g. name@okhdfcbank)');
+      return;
     }
 
     hideVerifyError();
@@ -188,7 +166,7 @@ const App = (() => {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type:  activeTab,
+          type:  'upi',
           value: value,
           name:  applicant.name,
           email: applicant.email,
@@ -197,10 +175,7 @@ const App = (() => {
       });
 
       const json = await res.json();
-
-      if (!res.ok || !json.success) {
-        throw new Error(json.error || 'Validation failed — please try again.');
-      }
+      if (!res.ok || !json.success) throw new Error(json.error || 'Validation failed — please try again.');
 
       bankData = json.data;
       renderBankDetails(bankData, json.demo);
@@ -213,32 +188,137 @@ const App = (() => {
     }
   }
 
+  // ─── Step 2 — Reverse Penny Drop: initiate ───────────────────
+  async function startRPD() {
+    const btn = document.getElementById('btn-start-rpd');
+    btn.disabled = true;
+    btn.textContent = 'Starting…';
+
+    try {
+      const res  = await fetch('/api/validate-rpd', { method: 'POST' });
+      const json = await res.json();
+
+      if (!res.ok || !json.success) throw new Error(json.error || 'Failed to start verification.');
+
+      rpdFavId = json.favId;
+
+      // Transition to payment UI
+      document.getElementById('rpd-intro').classList.add('hidden');
+      document.getElementById('rpd-pay').classList.remove('hidden');
+
+      if (json.demo) {
+        // Demo mode: auto-complete after 3 seconds with mock data
+        rpdPollTimer = setTimeout(() => {
+          bankData = {
+            vpa:            'demo@okhdfcbank',
+            bankName:       'HDFC Bank',
+            bankColor:      '#004C8F',
+            registeredName: applicant.name || 'Rahul Kumar',
+            accountNumber:  '50XXXXXX6789',
+            accountType:    'SAVINGS',
+            ifscCode:       'HDFC0001234',
+            accountStatus:  'active',
+            accountVerified: true,
+            validationId:   rpdFavId,
+            utr:            null,
+          };
+          renderBankDetails(bankData, true);
+          goTo(3);
+        }, 3000);
+        return;
+      }
+
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      if (isMobile && json.intentUrl) {
+        // Mobile: show app deep-link buttons
+        document.getElementById('rpd-qr-wrap').classList.add('hidden');
+        document.getElementById('rpd-apps-wrap').classList.remove('hidden');
+        if (json.phonepeUrl) document.getElementById('rpd-btn-phonepe').href = json.phonepeUrl;
+        if (json.gpayUrl)    document.getElementById('rpd-btn-gpay').href    = json.gpayUrl;
+        if (json.paytmUrl)   document.getElementById('rpd-btn-paytm').href   = json.paytmUrl;
+        if (json.bhimUrl)    document.getElementById('rpd-btn-bhim').href    = json.bhimUrl;
+        if (json.intentUrl)  document.getElementById('rpd-btn-any').href     = json.intentUrl;
+      } else if (json.qrCode) {
+        // Desktop: show QR code
+        document.getElementById('rpd-qr-wrap').classList.remove('hidden');
+        document.getElementById('rpd-apps-wrap').classList.add('hidden');
+        document.getElementById('rpd-qr-img').src = 'data:image/png;base64,' + json.qrCode;
+      }
+
+      // Start polling regardless of QR vs app buttons
+      pollRPD(rpdFavId);
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = 'Start Verification <svg viewBox="0 0 20 20" fill="currentColor" style="width:18px;height:18px"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/></svg>';
+      showRPDError(err.message || 'Failed to start. Please try again.');
+    }
+  }
+
+  // ─── Step 2 — Reverse Penny Drop: poll ───────────────────────
+  function pollRPD(favId) {
+    rpdPollTimer = setInterval(async () => {
+      try {
+        const res  = await fetch(`/api/validate-rpd/${favId}`);
+        const json = await res.json();
+
+        if (!res.ok) throw new Error(json.error || 'Poll failed');
+
+        if (json.status === 'completed' && json.data) {
+          clearInterval(rpdPollTimer);
+          bankData = json.data;
+          renderBankDetails(bankData, json.demo);
+          goTo(3);
+        } else if (json.status === 'failed') {
+          clearInterval(rpdPollTimer);
+          showRPDError('Verification failed. Please try again.');
+        }
+        // else: still pending — keep polling
+      } catch (err) {
+        clearInterval(rpdPollTimer);
+        showRPDError(err.message || 'Connection error. Please try again.');
+      }
+    }, 3000);
+  }
+
+  // ─── Step 2 — Reverse Penny Drop: cancel ─────────────────────
+  function cancelRPD() {
+    clearInterval(rpdPollTimer);
+    clearTimeout(rpdPollTimer);
+    rpdFavId     = null;
+    rpdPollTimer = null;
+
+    document.getElementById('rpd-intro').classList.remove('hidden');
+    document.getElementById('rpd-pay').classList.add('hidden');
+    document.getElementById('rpd-qr-wrap').classList.remove('hidden');
+    document.getElementById('rpd-apps-wrap').classList.add('hidden');
+    hideRPDError();
+
+    const btn = document.getElementById('btn-start-rpd');
+    btn.disabled = false;
+    btn.innerHTML = 'Start Verification <svg viewBox="0 0 20 20" fill="currentColor" style="width:18px;height:18px"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/></svg>';
+  }
+
   // ─── UPI format validator ─────────────────────────────────────
   function isValidUPI(vpa) {
-    // Must contain exactly one @, both sides non-empty
     return /^[a-zA-Z0-9._\-+]+@[a-zA-Z0-9]+$/.test(vpa);
   }
 
   // ─── Render bank details on screen 3 ─────────────────────────
   function renderBankDetails(data, demo) {
-    // Bank avatar + color
-    const avatar = document.getElementById('bank-avatar');
-    const initials = (data.bankName || 'BK')
-      .split(' ')
-      .slice(0, 2)
-      .map(w => w[0])
-      .join('');
-    avatar.textContent = initials;
-    avatar.style.background = data.bankColor || '#1D4ED8';
+    const avatar   = document.getElementById('bank-avatar');
+    const initials = (data.bankName || 'BK').split(' ').slice(0, 2).map(w => w[0]).join('');
+    avatar.textContent       = initials;
+    avatar.style.background  = data.bankColor || '#1D4ED8';
 
     setText('bank-name-display',  data.bankName || '—');
-    setText('bank-branch-display', data.branchName || data.vpa.split('@')[1]?.toUpperCase() || '—');
+    setText('bank-branch-display', data.branchName || (data.vpa ? data.vpa.split('@')[1]?.toUpperCase() : null) || '—');
     setText('detail-name',   data.registeredName || applicant.name || '—');
     setText('detail-vpa',    data.vpa || '—');
     setText('detail-fa-id',  data.fundAccountId  || '—');
     setText('detail-fav-id', data.validationId   || '—');
 
-    // Account number + IFSC (available in demo; live API doesn't expose raw numbers for VPA)
     const rowAccount = document.getElementById('row-account');
     const rowIfsc    = document.getElementById('row-ifsc');
     if (data.accountNumber) {
@@ -254,9 +334,7 @@ const App = (() => {
       rowIfsc.classList.add('hidden');
     }
 
-    // Demo note
-    const demoNote = document.getElementById('demo-note');
-    demoNote.classList.toggle('hidden', !demo);
+    document.getElementById('demo-note').classList.toggle('hidden', !demo);
   }
 
   // ─── Populate success screen ──────────────────────────────────
@@ -268,28 +346,29 @@ const App = (() => {
     setText('success-loan',   applicant.loanAmount ? `₹${Number(applicant.loanAmount).toLocaleString('en-IN')}` : '—');
   }
 
-  // ─── Loading state ────────────────────────────────────────────
+  // ─── Loading state (UPI panel) ────────────────────────────────
   function setLoadingState(loading) {
     const loadingEl = document.getElementById('verify-loading');
     const btnEl     = document.getElementById('btn-verify');
     const formEl    = document.getElementById('form-verify');
-
     loadingEl.classList.toggle('hidden', !loading);
     btnEl.disabled = loading;
-
-    // Disable inputs while loading
-    formEl.querySelectorAll('input, button').forEach(el => {
-      if (el !== btnEl) el.disabled = loading;
-    });
+    formEl.querySelectorAll('input, button').forEach(el => { if (el !== btnEl) el.disabled = loading; });
   }
 
   function showVerifyError(msg) {
-    const errEl = document.getElementById('verify-error');
     document.getElementById('verify-error-msg').textContent = msg;
-    errEl.classList.remove('hidden');
+    document.getElementById('verify-error').classList.remove('hidden');
   }
   function hideVerifyError() {
     document.getElementById('verify-error').classList.add('hidden');
+  }
+  function showRPDError(msg) {
+    document.getElementById('rpd-error-msg').textContent = msg;
+    document.getElementById('rpd-error').classList.remove('hidden');
+  }
+  function hideRPDError() {
+    document.getElementById('rpd-error').classList.add('hidden');
   }
 
   // ─── Field helpers ─────────────────────────────────────────────
@@ -314,18 +393,17 @@ const App = (() => {
   function reset() {
     applicant.name = applicant.email = applicant.phone = '';
     applicant.loanAmount = 0;
-    bankData   = null;
-    activeTab  = 'upi';
+    bankData = null;
 
     document.getElementById('inp-name').value  = '';
     document.getElementById('inp-email').value = '';
     document.getElementById('inp-phone').value = '';
     document.getElementById('inp-loan').value  = '';
     document.getElementById('inp-upi').value   = '';
-    document.getElementById('inp-vpa-phone').value = '';
 
+    cancelRPD();
     hideVerifyError();
-    switchTab('upi');
+    switchMode('upi');
     goTo(0);
   }
 
@@ -339,5 +417,5 @@ const App = (() => {
   // ─── Bootstrap ────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', init);
 
-  return { goTo: goToPublic, switchTab, reset };
+  return { goTo: goToPublic, switchMode, reset, startRPD, cancelRPD };
 })();

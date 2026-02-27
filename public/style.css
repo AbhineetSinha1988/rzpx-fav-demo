@@ -724,3 +724,227 @@ details[open] .ref-summary::after { content: ' ‹'; }
 
 /* ─── UTILITIES ──────────────────────────────────────────────── */
 .hidden { display: none !important; }
+
+/* ─── VERIFY OPTIONS ─────────────────────────────────────────── */
+.verify-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.verify-option {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #F9FAFB;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--font);
+  text-align: left;
+}
+.verify-option.active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+.verify-option:hover:not(.active) { background: #F3F4F6; border-color: #D1D5DB; }
+.option-radio {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  transition: border-color 0.15s;
+}
+.verify-option.active .option-radio { border-color: var(--primary); }
+.radio-inner {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 0.15s;
+}
+.verify-option.active .radio-inner { background: var(--primary); }
+.option-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+.verify-option.active .option-title { color: var(--primary); }
+.option-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+/* ─── VERIFY PANELS ──────────────────────────────────────────── */
+.verify-panel { display: none; }
+.verify-panel.active { display: block; }
+
+/* ─── RPD INTRO ──────────────────────────────────────────────── */
+.rpd-intro-box {
+  background: #F9FAFB;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 0;
+}
+.rpd-intro-icon {
+  width: 56px; height: 56px;
+  background: var(--primary-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+.rpd-intro-icon svg { width: 28px; height: 28px; color: var(--primary); }
+.rpd-intro-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+.rpd-intro-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.rpd-steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+  margin-bottom: 14px;
+}
+.rpd-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.rpd-step-num {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.rpd-refund-note {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ─── RPD QR ─────────────────────────────────────────────────── */
+.rpd-qr-wrap {
+  text-align: center;
+  padding: 24px 20px;
+  background: #F9FAFB;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+.rpd-pay-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+.rpd-qr-img {
+  width: 180px; height: 180px;
+  display: block;
+  margin: 0 auto 12px;
+  border-radius: 8px;
+}
+.rpd-qr-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ─── RPD APP BUTTONS ────────────────────────────────────────── */
+.rpd-apps-wrap {
+  margin-bottom: 16px;
+}
+.rpd-app-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+.rpd-app-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.rpd-app-btn:hover { background: #F3F4F6; border-color: #D1D5DB; transform: translateY(-1px); }
+.rpd-app-btn-wide {
+  grid-column: 1 / -1;
+  justify-content: center;
+  color: var(--primary);
+  border-color: var(--primary-border);
+  background: var(--primary-light);
+}
+.rpd-app-btn-wide:hover { background: #DBEAFE; }
+.app-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.phonepe-icon { background: #5F259F; }
+.gpay-icon    { background: #4285F4; }
+.paytm-icon   { background: #00BAF2; }
+.bhim-icon    { background: #00529B; }
+
+/* ─── RPD WAITING ────────────────────────────────────────────── */
+.rpd-waiting {
+  background: var(--primary-light);
+  border: 1px solid var(--primary-border);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.rpd-waiting-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.rpd-waiting-inner .loading-spinner {
+  width: 28px; height: 28px;
+  margin: 0;
+  flex-shrink: 0;
+}
+.rpd-waiting-inner .loading-text { font-size: 14px; margin-bottom: 2px; }
+.rpd-waiting-inner .loading-sub  { font-size: 12px; }

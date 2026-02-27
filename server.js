@@ -158,6 +158,92 @@ app.post('/api/validate', async (req, res) => {
   }
 });
 
+// ─── POST /api/validate-rpd — initiate reverse penny drop ────────────────────
+app.post('/api/validate-rpd', async (req, res) => {
+  if (!isLiveMode) {
+    return res.json({
+      success: true,
+      demo: true,
+      favId: 'fav_demo_' + Math.random().toString(36).slice(2, 11),
+      intentUrl: null, phonepeUrl: null, gpayUrl: null,
+      paytmUrl: null, bhimUrl: null, qrCode: null,
+    });
+  }
+
+  try {
+    const { data } = await rzpx.post('/fund_accounts/validations', {
+      source_account_number: RAZORPAY_ACCOUNT_NUMBER,
+      validation_type: 'upi_intent',
+      reference_id: `rpd_${Date.now()}`,
+      notes: { purpose: 'Reverse Penny Drop — Bank Verification' },
+    });
+
+    const intent = data.upi_intent || {};
+    return res.json({
+      success: true,
+      demo: false,
+      favId: data.id,
+      intentUrl:  intent.intent_url    || null,
+      phonepeUrl: intent.phonepe_url   || null,
+      gpayUrl:    intent.gpay_url      || null,
+      paytmUrl:   intent.paytm_url     || null,
+      bhimUrl:    intent.bhim_url      || null,
+      qrCode:     intent.encoded_qr_code || null,
+    });
+  } catch (err) {
+    console.error('RPD initiation error:', err.response?.data || err.message);
+    const apiError = err.response?.data?.error;
+    return res.status(err.response?.status || 500).json({
+      error: apiError?.description || err.message || 'Failed to initiate verification.',
+      code: apiError?.code,
+    });
+  }
+});
+
+// ─── GET /api/validate-rpd/:id — poll RPD status ─────────────────────────────
+app.get('/api/validate-rpd/:id', async (req, res) => {
+  if (!isLiveMode) {
+    return res.json({ success: true, demo: true, status: 'created' });
+  }
+
+  try {
+    const { data } = await rzpx.get(`/fund_accounts/validations/${req.params.id}`);
+
+    if (data.status !== 'completed' && data.status !== 'failed') {
+      return res.json({ success: true, status: data.status });
+    }
+
+    const results     = data.validation_results || {};
+    const bankAccount = results.bank_account    || {};
+    const upiVpa      = results.upi_intent?.vpa || null;
+    const bankInfo    = upiVpa ? getBankInfo(upiVpa) : { name: bankAccount.bank_name || 'Unknown Bank', color: '#6B7280' };
+    const accountStatus = results.account_status || 'unknown';
+
+    return res.json({
+      success: true,
+      status: data.status,
+      data: {
+        vpa:            upiVpa,
+        bankName:       bankAccount.bank_name   || bankInfo.name,
+        bankColor:      bankInfo.color,
+        registeredName: results.registered_name || 'Account Holder',
+        accountNumber:  bankAccount.account_number   || null,
+        accountType:    bankAccount.account_type     || null,
+        ifscCode:       bankAccount.bank_routing_code || null,
+        accountStatus,
+        accountVerified: accountStatus === 'active',
+        validationId:   data.id,
+        utr:            data.utr || null,
+      },
+    });
+  } catch (err) {
+    console.error('RPD poll error:', err.response?.data || err.message);
+    return res.status(err.response?.status || 500).json({
+      error: err.message || 'Failed to check verification status.',
+    });
+  }
+});
+
 // ─── GET /api/config ─────────────────────────────────────────────────────────
 // Lets the frontend know which mode is active
 app.get('/api/config', (_req, res) => {
