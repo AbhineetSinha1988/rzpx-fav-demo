@@ -453,7 +453,7 @@ const App = (() => {
       document.getElementById("mobile-footer").classList.add("hidden");
     }
 
-    // Center content vertically while waiting
+    // Full-screen overlay while waiting
     document.getElementById("screen-verifying").classList.add("rpd-waiting");
   }
 
@@ -567,7 +567,8 @@ const App = (() => {
   let _verifyRunId = 0;
 
   // beginVerifying — UI only, no data needed. Call immediately on submit.
-  function beginVerifying() {
+  // Pass initialTitle to skip the "Initiating paisa drop…" phase (RPD flow).
+  function beginVerifying(initialTitle) {
     const runId = ++_verifyRunId;
     goTo(3);
 
@@ -597,14 +598,10 @@ const App = (() => {
     const spinner = document.getElementById("verify-header-spinner");
     const badge = document.getElementById("verify-header-badge");
     const title = document.getElementById("verify-header-title");
-    if (spinner) {
-      spinner.classList.remove("hiding");
-    }
-    if (badge) {
-      badge.classList.add("hidden");
-    }
+    if (spinner) spinner.classList.remove("hiding");
+    if (badge)   badge.classList.add("hidden");
     if (title) {
-      title.textContent = "Initiating paisa drop…";
+      title.textContent = initialTitle || "Initiating paisa drop…";
       title.style.opacity = "";
       title.style.transform = "";
       title.style.transition = "";
@@ -612,26 +609,23 @@ const App = (() => {
     }
     document.getElementById("verifying-footer").classList.add("hidden");
 
-    // Phase 2 text crossfade — guarded against stale runs
-    setTimeout(() => {
-      if (_verifyRunId !== runId) return;
-      const t = document.getElementById("verify-header-title");
-      if (!t || t.style.color) return;
-      const reduced = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      if (reduced) {
-        t.textContent = "Fetching bank details…";
-        return;
-      }
-      t.style.transition = "opacity 0.15s ease";
-      t.style.opacity = "0";
+    // Phase 2 crossfade — only for UPI flow (no initialTitle)
+    if (!initialTitle) {
       setTimeout(() => {
-        if (_verifyRunId !== runId || t.style.color) return;
-        t.textContent = "Fetching bank details…";
-        t.style.opacity = "1";
-      }, 200);
-    }, 1800);
+        if (_verifyRunId !== runId) return;
+        const t = document.getElementById("verify-header-title");
+        if (!t || t.style.color) return;
+        const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduced) { t.textContent = "Fetching bank details…"; return; }
+        t.style.transition = "opacity 0.15s ease";
+        t.style.opacity = "0";
+        setTimeout(() => {
+          if (_verifyRunId !== runId || t.style.color) return;
+          t.textContent = "Fetching bank details…";
+          t.style.opacity = "1";
+        }, 200);
+      }, 1800);
+    }
   }
 
   // scheduleVerifyFields — populate shimmer cells once data is available
@@ -675,9 +669,9 @@ const App = (() => {
     }, 3700);
   }
 
-  // startVerifyAnimation — convenience for RPD flow (data already available)
+  // startVerifyAnimation — RPD flow: data already available, skip initiation phase
   function startVerifyAnimation(data) {
-    beginVerifying();
+    beginVerifying('Fetching your details…');
     scheduleVerifyFields(data);
   }
 

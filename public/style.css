@@ -1390,6 +1390,8 @@ details[open] .ref-summary::after {
   text-align: center;
   margin-top: 20px;
   padding: 0 4px;
+  justify-content: center;
+  align-items: center;
 }
 
 @media (max-width: 480px) {
@@ -1405,8 +1407,8 @@ details[open] .ref-summary::after {
     max-width: 640px;
     background: var(--bg-card);
     border-radius: 20px 20px 0 0;
-    padding: 12px 24px 40px;
-    padding-bottom: calc(40px + env(safe-area-inset-bottom));
+    padding: 12px 20px 32px;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom));
     z-index: 200;
     box-shadow: 0 -4px 40px rgba(0, 0, 0, 0.12);
     transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
@@ -1498,7 +1500,7 @@ body.on-verifying {
   font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.3px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   /* opacity/transform animated by JS for crossfade */
 }
 
@@ -1616,7 +1618,7 @@ body.on-verifying {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 14px 24px 4px;
+  padding: 24px 16px 32px;
   font-size: 12px;
   color: var(--text-muted);
   font-weight: 500;
@@ -1628,7 +1630,7 @@ body.on-verifying {
   flex-shrink: 0;
 }
 .npci-logo {
-  height: 18px;
+  height: 16px;
   width: auto;
   margin-left: 2px;
   object-fit: contain;
@@ -1675,12 +1677,16 @@ body.on-verifying {
   }
 }
 
-/* RPD waiting state: vertically center the header content */
+/* RPD waiting state: full-screen overlay, no container */
 #screen-verifying.rpd-waiting {
+  position: fixed;
+  inset: 0;
+  top: 60px; /* below sticky header */
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 60px);
+  background: var(--bg-card);
+  z-index: 50;
 }
 
 /* Accessibility: respect reduced motion */
